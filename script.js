@@ -81,7 +81,7 @@ for(let i = 0; i<amountOfEnemies;i++){
 
 
 function spawn(num){
-    console.log('spawning...')
+    // console.log('spawning...')
     for(let i =0 ; i < num; i++){
         enemyArray.push(new Enemy(i));
     }
@@ -97,7 +97,8 @@ canvas.addEventListener('click', (e) => {
         if(clickX >= enemyX && clickX < enemyX + enemyArray[i].w && clickY >= enemyY && clickY < enemyY + enemyArray[i].h ) {
         enemyArray[i].hit = true
         score++
-        console.log('You hit enemy : ' + enemyArray[i].idx)
+        break;
+        // console.log('You hit enemy : ' + enemyArray[i].idx)
          
     
         }
@@ -131,6 +132,7 @@ function animate(timeStamp) {
 
     enemyArray = enemyArray.filter((object) => !object.hit)
 
+    
     enemyArray.forEach(enemy => {
         enemy.update(timeStamp);
         enemy.draw();
