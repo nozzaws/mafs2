@@ -3,21 +3,39 @@ const canvas = document.getElementById('myCanvas')
 const ctx = canvas.getContext('2d')
 CANVAS_WIDTH = canvas.width = 800;
 CANVAS_HEIGHT = canvas.height = 600;
+
+
+let centerCanvasPosition = function(canvas){
+  canvas.style.left = window.innerWidth / 2 - canvas.width / 2 + 'px';
+  canvas.style.top =window.innerHeight / 2 - canvas.height / 2 + 'px';
+};
+ 
+ctx.fillStyle='black';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ 
+// center canvas for starters
+centerCanvasPosition(canvas);
+// and on every resize
+window.addEventListener('resize',function(){
+    centerCanvasPosition(canvas);
+});
+
+
 let offsetL = canvas.offsetLeft
 let offsetT = canvas.offsetTop
 
 let enemyArray = [];
-const amountOfEnemies = 25;
+const amountOfEnemies = 7;
 let newAr = []
-
+let score = 0;
 
 
 class Enemy{
     constructor(IDX){
         this.idx = IDX
         this.text = "Text"
-        this.h = 50;
-        this.w = 50;
+        this.h = 100;
+        this.w = this.h;
         this.x = Math.random() * (canvas.width - this.w);
         this.y = Math.random() * (canvas.height - this.h);
         this.speedx = Math.random() * 2 - 1;
@@ -41,6 +59,7 @@ class Enemy{
 
 
         //text in box rn
+        ctx.font = "50px Arial";
         ctx.fillStyle = "Black"
         ctx.fillText("Hej", this.x+this.w/2, this.y+this.h/2+3)
         ctx.fillStyle = "White"
@@ -50,24 +69,23 @@ class Enemy{
 
 }
 
+function updateScore(){
+    ctx.font = "50px Arial";
+    ctx.fillText(`${score}`,10,80)
+}
+
+
 for(let i = 0; i<amountOfEnemies;i++){
     enemyArray.push(new Enemy(i));
 }
 
 
-
-function youWon(){
-    return
-}
-
-function spawn(){
+function spawn(num){
     console.log('spawning...')
-    enemyArray.push(new Enemy());
+    for(let i =0 ; i < num; i++){
+        enemyArray.push(new Enemy(i));
+    }
 }
-
-let timeLapsed = 0
-let deltaTime = 0;
-let timeSinceLastClick = 0    
 
 canvas.addEventListener('click', (e) => {
     const clickX = e.clientX - offsetL
@@ -77,8 +95,11 @@ canvas.addEventListener('click', (e) => {
         let enemyX = enemyArray[i].x
         let enemyY = enemyArray[i].y
         if(clickX >= enemyX && clickX < enemyX + enemyArray[i].w && clickY >= enemyY && clickY < enemyY + enemyArray[i].h ) {
-            enemyArray[i].hit = true
-            console.log('You hit enemy : ' + enemyArray[i].idx)
+        enemyArray[i].hit = true
+        score++
+        console.log('You hit enemy : ' + enemyArray[i].idx)
+         
+    
         }
     }
 
@@ -93,31 +114,32 @@ canvas.addEventListener('click', (e) => {
 
     // });
 
-
+    
 
 });
 
-function animate(timelapsed) {
+
+
+
+const reload = () => {
+    spawn(5);
+}
+
+
+function animate(timeStamp) {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    deltaTime += timeLapsed - deltaTime
-    timeSinceLastClick = deltaTime
-    enemyArray = enemyArray.filter(object => !object.hit)
-    // console.log(newAr)
+    enemyArray = enemyArray.filter((object) => !object.hit)
 
     enemyArray.forEach(enemy => {
-        enemy.update(timelapsed);
+        enemy.update(timeStamp);
         enemy.draw();
     });
 
-
-    // console.log(timeSinceLastClick)
-
-
-
+    if(enemyArray.length === 0) reload();
+    updateScore()
     requestAnimationFrame(animate);
 
 }
 animate(0)
-
 
